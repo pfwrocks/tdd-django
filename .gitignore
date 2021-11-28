@@ -1,0 +1,6 @@
+db.sqlite3
+geckodriver.log
+venv/
+.DS_Store
+__pycache__
+*.pyc
