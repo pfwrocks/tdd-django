@@ -33,15 +33,20 @@ class NewVisitorTest(unittest.TestCase):
 		# can view updated item
 		table = self.browser.find_element_by_id('id_list_table')
 		rows = table.find_elements_by_tag_name('tr')
-		self.assertTrue(
-			any( row.text == '1: Buy peacock feathers' for row in rows ),
-			'New to-do item did not appear in table'
-		)
+		self.assertIn('1: Buy peacock feathers', [row.text for row in rows] )
 
 		# enter "Make fly" into textbox from same page
-		self.fail('Finish test!')
+		input_box = self.browser.find_element_by_id('id_new_item')
+		input_box.send_keys('Make fly')
+		input_box.send_keys(Keys.ENTER)
+		time.sleep(2)
 
 		# can see both items
+		table = self.browser.find_element_by_id('id_list_table')
+		rows = table.find_elements_by_tag_name('tr')
+		self.assertIn('1: Buy peacock feathers', [row.text for row in rows] )
+		self.assertIn('2: Make fly', [row.text for row in rows] )
+		self.fail('Finish Test!')
 
 		# closes & revists url to confirm to-do list exists
 
