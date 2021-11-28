@@ -10,6 +10,17 @@ class NewVisitorTest(unittest.TestCase):
 	def tearDown(self):
 		self.browser.quit()
 
+	def check_row_in_list_table(self, row_text):
+		table = self.browser.find_element_by_id('id_list_table')
+		rows = table.find_elements_by_tag_name('tr')
+		self.assertIn(row_text, [row.text for row in rows])
+
+	def enter_todo_in_textbox(self, text):
+		input_box = self.browser.find_element_by_id('id_new_item')
+		input_box.send_keys(text)
+		input_box.send_keys(Keys.ENTER)
+		time.sleep(1)
+
 	def test_build_list_and_retrieve_later(self):
 		self.browser.get('http://localhost:8000')
 
@@ -25,27 +36,15 @@ class NewVisitorTest(unittest.TestCase):
 			'Enter a to-do item'
 		)
 
-		# enter "Buy peacock feathers" into textbox
-		input_box.send_keys('Buy peacock feathers')
-		input_box.send_keys(Keys.ENTER)
-		time.sleep(1)
+		# enter "Buy peacock feathers" into textbox & can view item
+		self.enter_todo_in_textbox('Buy peacock feathers')
+		self.check_row_in_list_table('1: Buy peacock feathers')
 
-		# can view updated item
-		table = self.browser.find_element_by_id('id_list_table')
-		rows = table.find_elements_by_tag_name('tr')
-		self.assertIn('1: Buy peacock feathers', [row.text for row in rows] )
+		# enter "Make fly" into textbox from same page & can view both items
+		self.enter_todo_in_textbox('Make fly')
+		self.check_row_in_list_table('1: Buy peacock feathers')
+		self.check_row_in_list_table('2: Make fly')
 
-		# enter "Make fly" into textbox from same page
-		input_box = self.browser.find_element_by_id('id_new_item')
-		input_box.send_keys('Make fly')
-		input_box.send_keys(Keys.ENTER)
-		time.sleep(2)
-
-		# can see both items
-		table = self.browser.find_element_by_id('id_list_table')
-		rows = table.find_elements_by_tag_name('tr')
-		self.assertIn('1: Buy peacock feathers', [row.text for row in rows] )
-		self.assertIn('2: Make fly', [row.text for row in rows] )
 		self.fail('Finish Test!')
 
 		# closes & revists url to confirm to-do list exists
