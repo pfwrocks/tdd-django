@@ -13,8 +13,25 @@ class HomePageTest(TestCase):
 
 	def test_can_save_POST_request(self):
 		response = self.client.post('/', data={'item_text': 'test list item'})
-		self.assertIn('test list item', response.content.decode())
-		self.assertTemplateUsed(response, 'home.html')
+		self.assertEqual(Item.objects.count(), 1)
+		self.assertEqual(Item.objects.first().text, 'test list item')
+
+	def test_redirects_after_POST_request(self):
+		response = self.client.post('/', data={'item_text': 'test list item'})
+		self.assertEqual(response.status_code, 302)
+		self.assertEqual(response['location'], '/')
+
+	def test_only_saves_items_when_necessary(self):
+		self.client.get('/')
+		self.assertEqual(Item.objects.count(), 0)
+
+	def test_displays_all_list_items(self):
+		Item.objects.create(text='I1')
+		Item.objects.create(text='I2')
+
+		response = self.client.get('/')
+		self.assertIn('I1', response.content.decode())
+		self.assertIn('I2', response.content.decode())
 
 class ItemModelTest(TestCase):
 	def test_saving_and_retreiving_items(self):
