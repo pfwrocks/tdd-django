@@ -6,24 +6,9 @@ from lists.views import home_page
 from lists.models import Item
 
 class HomePageTest(TestCase):
-
 	def test_uses_home_page_template(self):
 		response = self.client.get('/')
 		self.assertTemplateUsed(response, 'home.html')
-
-	def test_can_save_POST_request(self):
-		response = self.client.post('/', data={'item_text': 'test list item'})
-		self.assertEqual(Item.objects.count(), 1)
-		self.assertEqual(Item.objects.first().text, 'test list item')
-
-	def test_redirects_after_POST_request(self):
-		response = self.client.post('/', data={'item_text': 'test list item'})
-		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response['location'], '/lists/only-list/')
-
-	def test_only_saves_items_when_necessary(self):
-		self.client.get('/')
-		self.assertEqual(Item.objects.count(), 0)
 
 class ItemModelTest(TestCase):
 	def test_saving_and_retreiving_items(self):
@@ -55,3 +40,13 @@ class LiveViewTest(TestCase):
 		response = self.client.get('/lists/only-list/')
 		self.assertContains(response, 'I1')
 		self.assertContains(response, 'I2')
+
+class NewListTest(TestCase):
+	def test_can_save_POST_request(self):
+		response = self.client.post('/lists/new', data={'item_text': 'test list item'})
+		self.assertEqual(Item.objects.count(), 1)
+		self.assertEqual(Item.objects.first().text, 'test list item')
+
+	def test_redirects_after_POST_request(self):
+		response = self.client.post('/lists/new', data={'item_text': 'test list item'})
+		self.assertRedirects(response, '/lists/only-list/')
