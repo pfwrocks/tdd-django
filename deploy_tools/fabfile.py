@@ -28,10 +28,10 @@ def _create_or_update_dotenv():
 		append('.env', f'DJANGO_SECRET_KEY={new_secret}')
 
 def _update_static_files():
-	run('./virtualenv/bin/python manage.py collectstatic --noinput')
+	run('./venv/bin/python manage.py collectstatic --noinput')
 
 def _update_database():
-	run('./virtualenv/bin/python manage.py migrate --noinput')
+	run('./venv/bin/python manage.py migrate --noinput')
 
 def deploy():
 	site_folder = f'/home/{env.user}/sites/{env.host}'
