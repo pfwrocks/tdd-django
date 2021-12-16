@@ -1,39 +1,8 @@
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from .base import FunctionalTest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import WebDriverException
-import unittest, time, os
 
-MAX_WAIT = 10
-
-class NewVisitorTest(StaticLiveServerTestCase):
-
-	def setUp(self):
-		self.browser = webdriver.Firefox()
-		staging_server = os.environ.get('STAGING_SERVER')
-		if staging_server:
-			self.live_server_url = 'http://' + staging_server
-
-	def tearDown(self):
-		self.browser.quit()
-
-	def wait_for_row_in_list_table(self, row_text):
-		start_time = time.time()
-		while True:
-			try:
-				table = self.browser.find_element_by_id('id_list_table')
-				rows = self.browser.find_elements_by_tag_name('tr')
-				self.assertIn(row_text, [row.text for row in rows])
-				return
-			except (AssertionError, WebDriverException) as e:
-				if time.time()-start_time > MAX_WAIT:
-					raise e
-				time.sleep(0.1)
-
-	def enter_todo_in_textbox(self, text):
-		input_box = self.browser.find_element_by_id('id_new_item')
-		input_box.send_keys(text)
-		input_box.send_keys(Keys.ENTER)
+class NewVisitorTest(FunctionalTest):
 
 	def test_start_list_for_single_user(self):
 		self.browser.get(self.live_server_url)
@@ -94,27 +63,3 @@ class NewVisitorTest(StaticLiveServerTestCase):
 		self.assertNotIn('Buy peacock feathers', page_text)
 		self.assertNotIn('Make fly', page_text)
 		self.assertIn('Buy milk', page_text)
-
-	def test_layout_and_styling(self):
-		# visit home page
-		self.browser.get(self.live_server_url)
-		self.browser.set_window_size(1024, 768)
-
-		# styling in place
-		input_box = self.browser.find_element_by_id('id_new_item')
-		self.assertAlmostEqual(
-			input_box.location['x'] + input_box.size['width'] / 2,
-			512,
-			delta=10
-		)
-
-		# begin new list
-		self.enter_todo_in_textbox('I1')
-		self.wait_for_row_in_list_table('1: I1')
-		input_box = self.browser.find_element_by_id('id_new_item')
-		self.assertAlmostEqual(
-			input_box.location['x']+input_box.size['width']/2,
-			512,
-			delta=10
-		)
-
