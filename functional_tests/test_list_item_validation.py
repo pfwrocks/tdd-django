@@ -14,7 +14,7 @@ class ItemValidationTest(FunctionalTest):
 			"You can't have an empty list item"
 		))
 
-		# enters correctly
+		# enters first item correctly
 		self.enter_todo_in_textbox('first item')
 		self.wait_for_row_in_list_table('1: first item')
 
@@ -26,6 +26,10 @@ class ItemValidationTest(FunctionalTest):
 			self.browser.find_element_by_css_selector('.has-error').text,
 			"You can't have an empty list item"
 		))
+
+		# enters second item correctly
+		self.enter_todo_in_textbox('second item')
+		self.wait_for_row_in_list_table('2: second item')
 
 		# fills it in correctly
 		self.enter_todo_in_textbox('second item')
